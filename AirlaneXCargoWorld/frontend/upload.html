@@ -1,0 +1,17 @@
+<h2>Upload Destinasi</h2>
+<input type="file" id="image">
+<button onclick="upload()">Upload</button>
+
+<script>
+function upload() {
+  const data = new FormData();
+  data.append("image", document.getElementById("image").files[0]);
+
+  fetch("http://localhost:3000/upload", {
+    method: "POST",
+    body: data
+  })
+  .then(res => res.json())
+  .then(d => alert("Berhasil upload"))
+}
+</script>

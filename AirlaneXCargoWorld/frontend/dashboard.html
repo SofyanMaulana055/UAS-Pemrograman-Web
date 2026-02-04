@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - AirlaneXCargo</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app"></div>
+  <script src="js/dashboard-router.js"></script>
+
+  <aside class="sidebar">
+  <ul>
+    <li onclick="loadPage('dashboard')">
+      <i class="icon-users"></i> Dashboard
+    </li>
+
+    <li onclick="loadPage('users')">
+      <i class="icon-users"></i> Kelola Pengguna
+    </li>
+
+    <li onclick="loadPage('shipments')">
+      <i class="icon-box"></i> Kelola Pengiriman
+    </li>
+
+    <li onclick="loadPage('destinations')">
+      <i class="icon-map"></i> Kelola Destinasi
+    </li>
+
+    <li onclick="loadPage('reports')">
+      <i class="icon-file"></i> Laporan & Analitik
+    </li>
+
+    <li onclick="loadPage('settings')">
+      <i class="icon-gear"></i> Pengaturan Sistem
+    </li>
+  </ul>
+</aside>
+<footer style="text-align:center; padding:10px; margin-top:30px;">
+  @Copyright by 23552011379_SofyanMaulana_TIF23RP_UASWEB1
+</footer>
+</body>
+</html>
+
+<div class="dashboard">
+  <aside class="sidebar">
+    <!-- MENU -->
+  </aside>
+
+  <main class="content" id="content">
+    <!-- KONTEN DINAMIS MUNCUL DI SINI -->
+  </main>
+</div>

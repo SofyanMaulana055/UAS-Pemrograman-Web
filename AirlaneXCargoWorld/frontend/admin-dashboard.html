@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - AirlaneXCargo</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="admin-dashboard-body">
+
+<!-- NAVBAR -->
+<nav class="navbar admin-navbar">
+  <div class="navbar-container">
+    <div class="navbar-brand">
+      <i class="fas fa-plane"></i>
+      <span>AirlaneXCargo Admin</span>
+    </div>
+    
+    <ul class="navbar-menu">
+      <li><a href="admin-dashboard.html" class="active"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+      <li><a href="#pengguna"><i class="fas fa-users"></i> Pengguna</a></li>
+      <li><a href="#pengiriman"><i class="fas fa-boxes"></i> Pengiriman</a></li>
+      <li><a href="#destinasi"><i class="fas fa-map-marked"></i> Destinasi</a></li>
+      <li><a href="#laporan"><i class="fas fa-file-alt"></i> Laporan</a></li>
+    </ul>
+
+    <div class="navbar-user">
+      <span id="username-display">Admin</span>
+      <span class="user-badge admin-badge"><i class="fas fa-shield-alt"></i> Administrator</span>
+      <button class="btn-logout" onclick="logout()">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- SIDEBAR (Optional) -->
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <div class="sidebar-menu">
+      <!-- MAIN -->
+      <div class="sidebar-section-title">UTAMA</div>
+      <a href="admin-dashboard.html" class="sidebar-item active" onclick="switchTab(event, 'dashboard')">
+        <i class="fas fa-chart-line"></i>
+        <span>Dashboard</span>
+      </a>
+      
+      <!-- SEPARATOR -->
+      <div class="sidebar-separator"></div>
+      
+      <!-- MANAGEMENT -->
+      <div class="sidebar-section-title">MANAJEMEN</div>
+      <a href="#pengguna" class="sidebar-item" onclick="switchTab(event, 'pengguna')">
+        <i class="fas fa-users"></i>
+        <span>Kelola Pengguna</span>
+      </a>
+      <a href="#pengiriman" class="sidebar-item" onclick="switchTab(event, 'pengiriman')">
+        <i class="fas fa-boxes"></i>
+        <span>Kelola Pengiriman</span>
+      </a>
+      <a href="#destinasi" class="sidebar-item" onclick="switchTab(event, 'destinasi')">
+        <i class="fas fa-map-marked"></i>
+        <span>Kelola Destinasi</span>
+      </a>
+      
+      <!-- SEPARATOR -->
+      <div class="sidebar-separator"></div>
+      
+      <!-- REPORTS & SETTINGS -->
+      <div class="sidebar-section-title">LAPORAN & PENGATURAN</div>
+      <a href="#laporan" class="sidebar-item" onclick="switchTab(event, 'laporan')">
+        <i class="fas fa-file-alt"></i>
+        <span>Laporan & Analitik</span>
+      </a>
+      <a href="#pengaturan" class="sidebar-item" onclick="switchTab(event, 'pengaturan')">
+        <i class="fas fa-cog"></i>
+        <span>Pengaturan Sistem</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div class="admin-main">
+    <!-- HEADER SECTION -->
+    <section class="admin-welcome">
+      <h1>Dashboard Administratif</h1>
+      <p>Kelola sistem logistik dan data pengguna AirlaneXCargo</p>
+    </section>
+
+    <!-- ADMIN STATS -->
+    <section class="admin-stats">
+      <div class="admin-stat-card">
+        <div class="stat-header">
+          <h3 id="stat-users">0</h3>
+          <i class="fas fa-users"></i>
+        </div>
+        <p>Total Pengguna</p>
+        <span class="stat-change">+12% dari bulan lalu</span>
+      </div>
+
+      <div class="admin-stat-card">
+        <div class="stat-header">
+          <h3 id="stat-pengiriman-total">0</h3>
+          <i class="fas fa-boxes"></i>
+        </div>
+        <p>Total Pengiriman</p>
+        <span class="stat-change">+8% dari bulan lalu</span>
+      </div>
+
+      <div class="admin-stat-card">
+        <div class="stat-header">
+          <h3 id="stat-destinasi-total">0</h3>
+          <i class="fas fa-globe"></i>
+        </div>
+        <p>Destinasi Aktif</p>
+        <span class="stat-change">+2 destinasi baru</span>
+      </div>
+
+      <div class="admin-stat-card">
+        <div class="stat-header">
+          <h3 id="stat-revenue">Rp 0</h3>
+          <i class="fas fa-dollar-sign"></i>
+        </div>
+        <p>Revenue Total</p>
+        <span class="stat-change">+15% dari bulan lalu</span>
+      </div>
+    </section>
+
+    <!-- CHARTS -->
+    <section class="admin-charts">
+      <div class="admin-chart-card">
+        <h3><i class="fas fa-chart-line"></i> Pengiriman per Bulan</h3>
+        <canvas id="shipmentChart"></canvas>
+      </div>
+
+      <div class="admin-chart-card">
+        <h3><i class="fas fa-chart-pie"></i> Distribusi Status Pengiriman</h3>
+        <canvas id="statusDistributionChart"></canvas>
+      </div>
+
+      <div class="admin-chart-card">
+        <h3><i class="fas fa-chart-bar"></i> Top 5 Destinasi</h3>
+        <canvas id="topDestinationsChart"></canvas>
+      </div>
+
+      <div class="admin-chart-card">
+        <h3><i class="fas fa-chart-area"></i> Tren Pengguna Baru</h3>
+        <canvas id="userTrendChart"></canvas>
+      </div>
+    </section>
+
+    <!-- MANAGEMENT TABLES -->
+    <section class="admin-management">
+      <!-- PENGGUNA TABLE -->
+      <div class="management-card">
+        <div class="card-header">
+          <h2><i class="fas fa-users"></i> Manajemen Pengguna</h2>
+          <button class="btn-add" onclick="openAddUserModal()">
+            <i class="fas fa-plus"></i> Tambah Pengguna
+          </button>
+        </div>
+        <div class="table-responsive">
+          <table id="users-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Tanggal Daftar</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="6" style="text-align: center; padding: 30px;">
+                  <i class="fas fa-spinner fa-spin"></i> Memuat data...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PENGIRIMAN TABLE -->
+      <div class="management-card">
+        <div class="card-header">
+          <h2><i class="fas fa-boxes"></i> Manajemen Pengiriman</h2>
+          <button class="btn-add" onclick="openAddShipmentModal()">
+            <i class="fas fa-plus"></i> Tambah Pengiriman
+          </button>
+        </div>
+        <div class="table-responsive">
+          <table id="shipments-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Paket</th>
+                <th>Dari</th>
+                <th>Ke</th>
+                <th>Status</th>
+                <th>Pengguna</th>
+                <th>Tanggal</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="8" style="text-align: center; padding: 30px;">
+                  <i class="fas fa-spinner fa-spin"></i> Memuat data...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- DESTINASI TABLE -->
+      <div class="management-card">
+        <button onclick="exportPDF()">Export PDF</button>
+        <button onclick="exportExcel()">Export Excel</button>
+        <div class="card-header">
+          <h2><i class="fas fa-map-marked"></i> Manajemen Destinasi</h2>
+          <button class="btn-add" onclick="openAddDestinationModal()">
+            <i class="fas fa-plus"></i> Tambah Destinasi
+          </button>
+        </div>
+        <div class="table-responsive">
+          <table id="destinations-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nama</th>
+                <th>Negara</th>
+                <th>Biaya Pengiriman</th>
+                <th>Status</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="6" style="text-align: center; padding: 30px;">
+                  <i class="fas fa-spinner fa-spin"></i> Memuat data...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- LAPORAN & ANALITIK SECTION -->
+    <section id="admin-laporan" class="admin-laporan" style="display: none;">
+      <div class="section-header">
+        <h2><i class="fas fa-file-alt"></i> Laporan & Analitik</h2>
+      </div>
+      <div class="laporan-container">
+        <div class="laporan-card">
+          <h3><i class="fas fa-chart-line"></i> Pertumbuhan Pengiriman</h3>
+          <p>Analisis pertumbuhan pengiriman per bulan</p>
+          <button class="btn-primary" onclick="viewDetailReport('shipment')">Lihat Detail</button>
+        </div>
+        <div class="laporan-card">
+          <h3><i class="fas fa-chart-pie"></i> Distribusi Destinasi</h3>
+          <p>Analisis distribusi pengiriman per destinasi</p>
+          <button class="btn-primary" onclick="viewDetailReport('destination')">Lihat Detail</button>
+        </div>
+        <div class="laporan-card">
+          <h3><i class="fas fa-users"></i> Statistik Pengguna</h3>
+          <p>Analisis aktivitas dan pertumbuhan pengguna</p>
+          <button class="btn-primary" onclick="viewDetailReport('user')">Lihat Detail</button>
+        </div>
+        <div class="laporan-card">
+          <h3><i class="fas fa-dollar-sign"></i> Revenue Report</h3>
+          <p>Laporan pendapatan dan financial overview</p>
+          <button class="btn-primary" onclick="viewDetailReport('revenue')">Lihat Detail</button>
+        </div>
+      </div>
+      <div class="export-buttons">
+        <button class="btn-export" onclick="exportPDF()">
+          <i class="fas fa-file-pdf"></i> Export PDF
+        </button>
+        <button class="btn-export" onclick="exportExcel()">
+          <i class="fas fa-file-excel"></i> Export Excel
+        </button>
+      </div>
+    </section>
+
+    <!-- PENGATURAN SISTEM SECTION -->
+    <section id="admin-pengaturan" class="admin-pengaturan" style="display: none;">
+      <div class="section-header">
+        <h2><i class="fas fa-cog"></i> Pengaturan Sistem</h2>
+      </div>
+      <div class="settings-container">
+        <div class="settings-card">
+          <h3><i class="fas fa-database"></i> Manajemen Database</h3>
+          <p>Kelola backup dan restore database</p>
+          <div class="settings-actions">
+            <button class="btn-primary" onclick="backupDatabase()">
+              <i class="fas fa-download"></i> Backup Database
+            </button>
+            <button class="btn-secondary" onclick="restoreDatabase()">
+              <i class="fas fa-upload"></i> Restore Database
+            </button>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <h3><i class="fas fa-envelope"></i> Konfigurasi Email</h3>
+          <p>Pengaturan email untuk notifikasi sistem</p>
+          <div class="settings-form">
+            <input type="email" placeholder="Email Server" value="notifikasi@airlanexcargo.com">
+            <input type="password" placeholder="Password">
+            <button class="btn-primary">Simpan Konfigurasi</button>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <h3><i class="fas fa-lock"></i> Keamanan Sistem</h3>
+          <p>Kelola pengaturan keamanan aplikasi</p>
+          <div class="settings-options">
+            <label><input type="checkbox" checked> Aktifkan 2FA</label>
+            <label><input type="checkbox" checked> Enforce Strong Password</label>
+            <label><input type="checkbox"> Maintenance Mode</label>
+          </div>
+          <button class="btn-primary" style="margin-top: 15px;">Update Pengaturan</button>
+        </div>
+
+        <div class="settings-card">
+          <h3><i class="fas fa-info-circle"></i> Tentang Sistem</h3>
+          <p>Informasi versi dan status sistem</p>
+          <div class="system-info">
+            <p><strong>Versi Aplikasi:</strong> 1.0.0</p>
+            <p><strong>Database:</strong> MySQL 8.0</p>
+            <p><strong>Status:</strong> <span class="badge badge-success">Aktif</span></p>
+            <p><strong>Last Update:</strong> 30 January 2026</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<script src="js/admin-dashboard.js"></script>
+<footer style="text-align:center; padding:10px; margin-top:30px;">
+  @Copyright by 23552011379_SofyanMaulana_TIF23RP_UASWEB1
+</footer>
+</body>
+</html>
+
+<div class="sidebar">
+  <a href="users.html">
+    <i class="icon-users"></i> Kelola Pengguna
+  </a>
+
+  <a href="pengiriman.html">
+    <i class="icon-box"></i> Kelola Pengiriman
+  </a>
+
+  <a href="destinasi.html">
+    <i class="icon-map"></i> Kelola Destinasi
+  </a>
+
+  <a href="laporan.html">
+    <i class="icon-chart"></i> Laporan & Analitik
+  </a>
+
+  <a href="settings.html">
+    <i class="icon-gear"></i> Pengaturan Sistem
+  </a>
+</div>

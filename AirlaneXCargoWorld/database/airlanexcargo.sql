@@ -1,0 +1,20 @@
+CREATE DATABASE airlanexcargo;
+USE airlanexcargo;
+
+CREATE TABLE users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(50) UNIQUE NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  role VARCHAR(20) DEFAULT 'customer',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE cargo (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100),
+  destination VARCHAR(100),
+  weight INT,
+  user_id INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);

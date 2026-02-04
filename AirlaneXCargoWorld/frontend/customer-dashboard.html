@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Customer - AirlaneXCargo</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="customer-dashboard-body">
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="navbar-container">
+    <div class="navbar-brand">
+      <i class="fas fa-plane"></i>
+      <span>AirlaneXCargo</span>
+    </div>
+    
+    <ul class="navbar-menu">
+      <li><a href="customer-dashboard.html" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
+      <li><a href="#pengiriman"><i class="fas fa-box"></i> Pengiriman</a></li>
+      <li><a href="#destinasi"><i class="fas fa-map"></i> Destinasi</a></li>
+      <li><a href="#riwayat"><i class="fas fa-history"></i> Riwayat</a></li>
+    </ul>
+
+    <div class="navbar-user">
+      <span id="username-display">User</span>
+      <span class="user-badge"><i class="fas fa-user-circle"></i> Customer</span>
+      <button class="btn-logout" onclick="logout()">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<div class="dashboard-container">
+  <!-- WELCOME SECTION -->
+  <section class="welcome-section customer-welcome">
+    <h1>Selamat Datang, <span id="welcome-name">User</span>!</h1>
+    <p>Kelola pengiriman dan jelajahi destinasi wisata favorit Anda</p>
+  </section>
+
+  <!-- QUICK STATS -->
+  <section class="stats-section customer-stats">
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-box"></i>
+      </div>
+      <div class="stat-info">
+        <h3 id="stat-pengiriman">0</h3>
+        <p>Total Pengiriman</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <div class="stat-info">
+        <h3 id="stat-terkirim">0</h3>
+        <p>Sudah Terkirim</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-truck"></i>
+      </div>
+      <div class="stat-info">
+        <h3 id="stat-proses">0</h3>
+        <p>Dalam Proses</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-bookmark"></i>
+      </div>
+      <div class="stat-info">
+        <h3 id="stat-favorit">0</h3>
+        <p>Destinasi Favorit</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACTION BUTTONS -->
+  <section class="action-section">
+    <a href="#pengiriman-baru" class="action-card">
+      <i class="fas fa-plus-circle"></i>
+      <h3>Buat Pengiriman Baru</h3>
+      <p>Kirim paket ke destinasi pilihan Anda</p>
+    </a>
+
+    <a href="#destinasi" class="action-card">
+      <i class="fas fa-map-pin"></i>
+      <h3>Jelajahi Destinasi</h3>
+      <p>Lihat daftar destinasi wisata dan pengiriman</p>
+    </a>
+
+    <a href="#riwayat" class="action-card">
+      <i class="fas fa-history"></i>
+      <h3>Lihat Riwayat</h3>
+      <p>Cek pengiriman sebelumnya dan lacak paket</p>
+    </a>
+
+    <a href="#profil" class="action-card">
+      <i class="fas fa-user"></i>
+      <h3>Profil Saya</h3>
+      <p>Kelola informasi akun dan preferensi</p>
+    </a>
+  </section>
+
+  <!-- DESTINASI POPULER -->
+  <section class="customer-destinations">
+    <h2><i class="fas fa-map"></i> Destinasi Populer untuk Pengiriman</h2>
+    <div class="destinations-grid" id="destinasi-list">
+      <!-- Akan diisi dari API -->
+    </div>
+  </section>
+
+  <!-- PENGIRIMAN TERBARU -->
+  <section class="customer-shipments">
+    <h2><i class="fas fa-box-open"></i> Pengiriman Terbaru Anda</h2>
+    <div class="shipments-table">
+      <table id="shipments-table">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Paket</th>
+            <th>Dari</th>
+            <th>Ke</th>
+            <th>Status</th>
+            <th>Tanggal</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td colspan="7" style="text-align: center; padding: 30px;">
+              <i class="fas fa-inbox" style="font-size: 2em; color: #ccc;"></i>
+              <p style="color: #999;">Belum ada pengiriman</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SECTION PENGIRIMAN BARU -->
+  <section id="pengiriman" class="customer-section pengiriman-section">
+    <div class="section-header">
+      <h2><i class="fas fa-plus-circle"></i> Buat Pengiriman Baru</h2>
+      <a href="customer-dashboard.html" class="close-section"><i class="fas fa-times"></i></a>
+    </div>
+
+    <div class="pengiriman-container">
+      <div class="pengiriman-form">
+        <form id="pengirimanForm" onsubmit="submitPengiriman(event)">
+          <div class="form-section">
+            <h3><i class="fas fa-box"></i> Informasi Paket</h3>
+            
+            <div class="form-group">
+              <label for="nama-paket">Nama Paket</label>
+              <input type="text" id="nama-paket" placeholder="Contoh: Elektronik, Fashion, Furnitur" required>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="berat-paket">Berat Paket (kg)</label>
+                <input type="number" id="berat-paket" placeholder="0" min="0.5" step="0.5" required>
+              </div>
+              <div class="form-group">
+                <label for="kategori-paket">Kategori</label>
+                <select id="kategori-paket" required>
+                  <option value="">Pilih Kategori</option>
+                  <option value="elektronik">Elektronik</option>
+                  <option value="fashion">Fashion</option>
+                  <option value="furniture">Furnitur</option>
+                  <option value="makanan">Makanan</option>
+                  <option value="dokumen">Dokumen</option>
+                  <option value="lainnya">Lainnya</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="deskripsi">Deskripsi Paket</label>
+              <textarea id="deskripsi" placeholder="Jelaskan isi paket secara detail..." rows="4"></textarea>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3><i class="fas fa-map-pin"></i> Lokasi Pengiriman</h3>
+            
+            <div class="form-group">
+              <label for="dari-lokasi">Dari (Lokasi Asal)</label>
+              <input type="text" id="dari-lokasi" placeholder="Kota/Provinsi" required>
+            </div>
+
+            <div class="form-group">
+              <label for="ke-destinasi">Ke (Destinasi)</label>
+              <select id="ke-destinasi" required onchange="updateBiaya()">
+                <option value="">Pilih Destinasi</option>
+                <option value="tokyo">Tokyo - Jepang</option>
+                <option value="paris">Paris - Prancis</option>
+                <option value="dubai">Dubai - UAE</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="alamat-tujuan">Alamat Tujuan Lengkap</label>
+              <textarea id="alamat-tujuan" placeholder="Jalan, No, Kota, Kode Pos..." rows="3" required></textarea>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3><i class="fas fa-contact-card"></i> Informasi Penerima</h3>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="nama-penerima">Nama Penerima</label>
+                <input type="text" id="nama-penerima" placeholder="Nama lengkap" required>
+              </div>
+              <div class="form-group">
+                <label for="nomor-penerima">Nomor Telepon</label>
+                <input type="tel" id="nomor-penerima" placeholder="62..." required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="email-penerima">Email Penerima</label>
+              <input type="email" id="email-penerima" placeholder="email@example.com" required>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3><i class="fas fa-credit-card"></i> Metode Pembayaran</h3>
+            
+            <div class="payment-options">
+              <label class="payment-option">
+                <input type="radio" name="payment" value="transfer-bank" checked>
+                <span>Transfer Bank</span>
+              </label>
+              <label class="payment-option">
+                <input type="radio" name="payment" value="kartu-kredit">
+                <span>Kartu Kredit</span>
+              </label>
+              <label class="payment-option">
+                <input type="radio" name="payment" value="e-wallet">
+                <span>E-Wallet</span>
+              </label>
+              <label class="payment-option">
+                <input type="radio" name="payment" value="cod">
+                <span>Bayar Nanti (COD)</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-section cost-section">
+            <h3>Ringkasan Biaya</h3>
+            <div class="cost-item">
+              <span>Biaya Pengiriman:</span>
+              <span id="biaya-pengiriman">Rp 0</span>
+            </div>
+            <div class="cost-item">
+              <span>Asuransi:</span>
+              <span id="biaya-asuransi">Rp 10.000</span>
+            </div>
+            <div class="cost-item total">
+              <span>Total Biaya:</span>
+              <span id="total-biaya">Rp 10.000</span>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-submit">
+            <i class="fas fa-check"></i> Konfirmasi Pengiriman
+          </button>
+        </form>
+      </div>
+
+      <div class="pengiriman-info">
+        <div class="info-card">
+          <h4><i class="fas fa-info-circle"></i> Informasi Penting</h4>
+          <ul>
+            <li>Pastikan informasi penerima akurat</li>
+            <li>Paket akan diproses dalam 24 jam</li>
+            <li>Asuransi otomatis berlaku untuk semua pengiriman</li>
+            <li>Lacak paket melalui tracking number</li>
+          </ul>
+        </div>
+
+        <div class="info-card">
+          <h4><i class="fas fa-clock"></i> Estimasi Waktu</h4>
+          <ul>
+            <li><strong>Tokyo:</strong> 5-7 hari kerja</li>
+            <li><strong>Paris:</strong> 7-10 hari kerja</li>
+            <li><strong>Dubai:</strong> 3-5 hari kerja</li>
+          </ul>
+        </div>
+
+        <div class="info-card">
+          <h4><i class="fas fa-shield-alt"></i> Keamanan Paket</h4>
+          <p>Semua paket diasuransikan dan dilacak secara real-time. Kami menjamin keamanan barang Anda dari pengiriman hingga tiba di tangan penerima.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION DESTINASI -->
+  <section id="destinasi" class="customer-section destinasi-section">
+    <div class="section-header">
+      <h2><i class="fas fa-map"></i> Jelajahi Destinasi</h2>
+      <a href="customer-dashboard.html" class="close-section"><i class="fas fa-times"></i></a>
+    </div>
+
+    <div class="destinasi-filter">
+      <input type="text" id="destinasi-search" placeholder="Cari destinasi...">
+      <select id="destinasi-sort">
+        <option value="">Urutkan</option>
+        <option value="nama">Nama A-Z</option>
+        <option value="biaya">Biaya Termurah</option>
+        <option value="populer">Paling Populer</option>
+      </select>
+    </div>
+
+    <div class="destinasi-grid-full" id="destinasi-grid-full">
+      <!-- Akan diisi dari JavaScript -->
+    </div>
+
+    <div class="destinasi-stats">
+      <h3><i class="fas fa-chart-bar"></i> Statistik Destinasi</h3>
+      <div class="stats-grid">
+        <div class="stat">
+          <strong id="total-destinasi">0</strong>
+          <span>Destinasi Tersedia</span>
+        </div>
+        <div class="stat">
+          <strong id="pengiriman-minggu">0</strong>
+          <span>Pengiriman Minggu Ini</span>
+        </div>
+        <div class="stat">
+          <strong id="rating-rata">4.8/5</strong>
+          <span>Rating Rata-rata</span>
+        </div>
+        <div class="stat">
+          <strong id="kepuasan">98%</strong>
+          <span>Kepuasan Pelanggan</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION RIWAYAT -->
+  <section id="riwayat" class="customer-section riwayat-section">
+    <div class="section-header">
+      <h2><i class="fas fa-history"></i> Riwayat Pengiriman</h2>
+      <a href="customer-dashboard.html" class="close-section"><i class="fas fa-times"></i></a>
+    </div>
+
+    <div class="riwayat-filter">
+      <input type="text" id="riwayat-search" placeholder="Cari pengiriman...">
+      <select id="riwayat-filter-status">
+        <option value="">Semua Status</option>
+        <option value="terkirim">Terkirim</option>
+        <option value="proses">Dalam Proses</option>
+        <option value="pending">Pending</option>
+        <option value="dibatalkan">Dibatalkan</option>
+      </select>
+      <select id="riwayat-filter-periode">
+        <option value="">Semua Periode</option>
+        <option value="7">7 Hari Terakhir</option>
+        <option value="30">30 Hari Terakhir</option>
+        <option value="90">90 Hari Terakhir</option>
+      </select>
+    </div>
+
+    <div class="riwayat-list" id="riwayat-list">
+      <div class="riwayat-item">
+        <div class="riwayat-header">
+          <div class="riwayat-info">
+            <h4>#001 - Elektronik</h4>
+            <p>Jakarta → Tokyo</p>
+          </div>
+          <div class="riwayat-status">
+            <span class="badge badge-success">Terkirim</span>
+          </div>
+        </div>
+        <div class="riwayat-timeline">
+          <div class="timeline-item completed">
+            <div class="timeline-dot"></div>
+            <div class="timeline-text">
+              <strong>Paket Dikirim</strong>
+              <p>23 Jan 2026, 14:30</p>
+            </div>
+          </div>
+          <div class="timeline-item completed">
+            <div class="timeline-dot"></div>
+            <div class="timeline-text">
+              <strong>Paket di Transit</strong>
+              <p>24 Jan 2026, 09:15</p>
+            </div>
+          </div>
+          <div class="timeline-item completed">
+            <div class="timeline-dot"></div>
+            <div class="timeline-text">
+              <strong>Paket Tiba</strong>
+              <p>28 Jan 2026, 16:45</p>
+            </div>
+          </div>
+        </div>
+        <div class="riwayat-footer">
+          <button class="btn-detail" onclick="lihatDetail('#001')">
+            <i class="fas fa-eye"></i> Lihat Detail
+          </button>
+          <button class="btn-repeats" onclick="ulangiPengiriman('Elektronik', 'Tokyo')">
+            <i class="fas fa-redo"></i> Ulangi
+          </button>
+        </div>
+      </div>
+
+      <div class="riwayat-item">
+        <div class="riwayat-header">
+          <div class="riwayat-info">
+            <h4>#002 - Fashion</h4>
+            <p>Surabaya → Paris</p>
+          </div>
+          <div class="riwayat-status">
+            <span class="badge badge-primary">Dalam Proses</span>
+          </div>
+        </div>
+        <div class="riwayat-timeline">
+          <div class="timeline-item completed">
+            <div class="timeline-dot"></div>
+            <div class="timeline-text">
+              <strong>Paket Dikirim</strong>
+              <p>22 Jan 2026, 10:20</p>
+            </div>
+          </div>
+          <div class="timeline-item completed">
+            <div class="timeline-dot"></div>
+            <div class="timeline-text">
+              <strong>Paket di Transit</strong>
+              <p>24 Jan 2026, 15:00</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-text">
+              <strong>Estimasi Tiba</strong>
+              <p>31 Jan 2026</p>
+            </div>
+          </div>
+        </div>
+        <div class="riwayat-footer">
+          <button class="btn-detail" onclick="lihatDetail('#002')">
+            <i class="fas fa-eye"></i> Lihat Detail
+          </button>
+          <button class="btn-repeats" onclick="ulangiPengiriman('Fashion', 'Paris')">
+            <i class="fas fa-redo"></i> Ulangi
+          </button>
+        </div>
+      </div>
+
+      <div class="riwayat-item">
+        <div class="riwayat-header">
+          <div class="riwayat-info">
+            <h4>#003 - Furnitur</h4>
+            <p>Bandung → Dubai</p>
+          </div>
+          <div class="riwayat-status">
+            <span class="badge badge-warning">Pending</span>
+          </div>
+        </div>
+        <div class="riwayat-timeline">
+          <div class="timeline-item completed">
+            <div class="timeline-dot"></div>
+            <div class="timeline-text">
+              <strong>Paket Dikirim</strong>
+              <p>21 Jan 2026, 13:45</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-text">
+              <strong>Pengecekan Bea Cukai</strong>
+              <p>Sedang diproses</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-text">
+              <strong>Estimasi Transit</strong>
+              <p>Menunggu verifikasi</p>
+            </div>
+          </div>
+        </div>
+        <div class="riwayat-footer">
+          <button class="btn-detail" onclick="lihatDetail('#003')">
+            <i class="fas fa-eye"></i> Lihat Detail
+          </button>
+          <button class="btn-repeats" onclick="ulangiPengiriman('Furnitur', 'Dubai')">
+            <i class="fas fa-redo"></i> Ulangi
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="riwayat-pagination">
+      <button class="btn-page active">1</button>
+      <button class="btn-page">2</button>
+      <button class="btn-page">3</button>
+    </div>
+  </section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="js/customer-dashboard.js"></script>
+<script>
+function renderDestinations(destinations) {
+  const destList = document.getElementById("destinasi-list");
+  
+  // Data dummy dengan foto dari uploads/destinasi
+  const mockDestinations = [
+    {
+      id: 1,
+      nama: "Tokyo",
+      negara: "Jepang",
+      deskripsi: "Kota dengan teknologi canggih, budaya tradisional, dan pemandangan malam yang memukau",
+      biaya: 500000,
+      rating: 4.8,
+      jumlah_pengiriman: 150,
+      image: "http://localhost:3001/uploads/destinasi/tokyo.jpg"
+    },
+    {
+      id: 2,
+      nama: "Paris",
+      negara: "Prancis",
+      deskripsi: "Kota cahaya dengan Menara Eiffel, Louvre, dan keindahan arsitektur klasik yang legendaris",
+      biaya: 600000,
+      rating: 4.7,
+      jumlah_pengiriman: 120,
+      image: "http://localhost:3001/uploads/destinasi/paris.jpg"
+    },
+    {
+      id: 3,
+      nama: "Dubai",
+      negara: "UAE",
+      deskripsi: "Kota modern dengan Burj Khalifa, hotel mewah, dan pusat belanja terbesar di dunia",
+      biaya: 550000,
+      rating: 4.6,
+      jumlah_pengiriman: 180,
+      image: "http://localhost:3001/uploads/destinasi/dubai.jpg"
+    },
+    {
+      id: 4,
+      nama: "Singapore",
+      negara: "Singapura",
+      deskripsi: "Negara maju dengan Marina Bay Sands, Gardens by the Bay, dan infrastruktur kelas dunia",
+      biaya: 480000,
+      rating: 4.9,
+      jumlah_pengiriman: 200,
+      image: "http://localhost:3001/uploads/destinasi/singapore.jpg"
+    },
+    {
+      id: 5,
+      nama: "Bangkok",
+      negara: "Thailand",
+      deskripsi: "Kota dinamis dengan kuil Buddha megah, floating market, dan kehidupan malam yang meriah",
+      biaya: 400000,
+      rating: 4.5,
+      jumlah_pengiriman: 95,
+      image: "http://localhost:3001/uploads/destinasi/bangkok.jpg"
+    },
+    {
+      id: 6,
+      nama: "Sydney",
+      negara: "Australia",
+      deskripsi: "Kota pantai dengan Opera House ikonik, Harbour Bridge, dan pemandangan laut yang spektakuler",
+      biaya: 700000,
+      rating: 4.8,
+      jumlah_pengiriman: 110,
+      image: "http://localhost:3001/uploads/destinasi/sydney.jpg"
+    },
+    {
+      id: 7,
+      nama: "New York",
+      negara: "Amerika Serikat",
+      deskripsi: "Kota metropolitan dengan Times Square, Statue of Liberty, dan gedung pencakar langit ikonik",
+      biaya: 750000,
+      rating: 4.7,
+      jumlah_pengiriman: 200,
+      image: "http://localhost:3001/uploads/destinasi/newyork.jpg"
+    },
+    {
+      id: 8,
+      nama: "London",
+      negara: "Inggris",
+      deskripsi: "Kota bersejarah dengan Big Ben, Tower Bridge, dan museum kelas dunia yang menakjubkan",
+      biaya: 650000,
+      rating: 4.6,
+      jumlah_pengiriman: 140,
+      image: "http://localhost:3001/uploads/destinasi/london.jpg"
+    },
+    {
+      id: 9,
+      nama: "Amsterdam",
+      negara: "Belanda",
+      deskripsi: "Kota unik dengan kanal bersejarah, museum seni, dan bersepeda di jalanan yang asri",
+      biaya: 620000,
+      rating: 4.5,
+      jumlah_pengiriman: 85,
+      image: "http://localhost:3001/uploads/destinasi/amsterdam.jpg"
+    },
+    {
+      id: 10,
+      nama: "Barcelona",
+      negara: "Spanyol",
+      deskripsi: "Kota pantai dengan Sagrada Familia, Park Güell, dan budaya Catalan yang kaya dan unik",
+      biaya: 580000,
+      rating: 4.7,
+      jumlah_pengiriman: 125,
+      image: "http://localhost:3001/uploads/destinasi/barcelona.jpg"
+    },
+    {
+      id: 11,
+      nama: "Istanbul",
+      negara: "Turki",
+      deskripsi: "Kota bersejarah dengan Masjid Biru, Hagia Sophia, dan jembatan Golden Horn yang mempesona",
+      biaya: 480000,
+      rating: 4.6,
+      jumlah_pengiriman: 95,
+      image: "http://localhost:3001/uploads/destinasi/istanbul.jpg"
+    },
+    {
+      id: 12,
+      nama: "Bali",
+      negara: "Indonesia",
+      deskripsi: "Pulau tropis dengan pantai indah, kuil Hindu, dan pemandangan alam yang memukau mata",
+      biaya: 300000,
+      rating: 4.9,
+      jumlah_pengiriman: 350,
+      image: "http://localhost:3001/uploads/destinasi/bali.jpg"
+    }
+  ];
+
+  if (!mockDestinations || mockDestinations.length === 0) {
+    destList.innerHTML = '<p style="text-align: center; color: #999;">Belum ada destinasi</p>';
+    return;
+  }
+
+  destList.innerHTML = mockDestinations.map(dest => `
+    <div class="destination-card">
+      <img 
+        src="${dest.image}" 
+        alt="${dest.nama}" 
+        style="width: 100%; height: 200px; object-fit: cover; border-radius: 10px 10px 0 0;" 
+        onerror="this.src='https://via.placeholder.com/500x300?text=${dest.nama}&fontsize=20&textcolor=667eea'"
+      >
+      <div class="destination-info" style="position: static; background: white; padding: 20px; border-radius: 0 0 10px 10px; transform: none;">
+        <h3 style="margin: 0 0 5px 0; color: #333; font-size: 1.3em;">${dest.nama}</h3>
+        <p style="margin: 0 0 10px 0; color: #999; font-size: 0.95em;"><i class="fas fa-flag"></i> ${dest.negara}</p>
+        
+        <div style="margin: 12px 0; display: flex; gap: 15px; font-size: 0.9em; color: #666;">
+          <span title="Rating"><i class="fas fa-star" style="color: #ffc107;"></i> ${dest.rating}/5</span> 
+          <span title="Pengiriman"><i class="fas fa-box" style="color: #667eea;"></i> ${dest.jumlah_pengiriman}x</span>
+        </div>
+        
+        <p style="font-size: 0.9em; color: #666; margin: 12px 0; line-height: 1.5; border-top: 1px solid #eee; padding-top: 12px;">${dest.deskripsi}</p>
+        
+        <div style="margin: 15px 0; padding: 12px; background: #f8f9fa; border-radius: 5px; text-align: center;">
+          <p style="margin: 0; font-weight: 600; color: #667eea; font-size: 1.2em;">Rp ${(dest.biaya).toLocaleString('id-ID')}</p>
+          <p style="margin: 3px 0 0 0; font-size: 0.85em; color: #999;">Biaya Pengiriman</p>
+        </div>
+        
+        <button class="btn-small" onclick="selectDestination('${dest.id}', '${dest.nama}')" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px; font-weight: 600;">
+          <i class="fas fa-arrow-right"></i> Kirim ke ${dest.nama}
+        </button>
+      </div>
+    </div>
+  `).join("");
+
+  // Update stats
+  document.getElementById("total-destinasi").textContent = mockDestinations.length;
+  document.getElementById("pengiriman-minggu").textContent = mockDestinations.reduce((a, b) => a + (Math.random() * 50 | 0), 0);
+}
+
+// Panggil fungsi saat halaman load
+document.addEventListener('DOMContentLoaded', function() {
+  renderDestinations([]);
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Data destinasi untuk grid penuh
+  const allDestinations = [
+    { id: 1, nama: "Tokyo", negara: "Jepang", deskripsi: "Teknologi & Budaya Tradisional", biaya: 500000, rating: 4.8, jumlah_pengiriman: 150, image: "http://localhost:3001/uploads/destinasi/tokyo.jpg" },
+    { id: 2, nama: "Paris", negara: "Prancis", deskripsi: "Menara Eiffel & Seni Dunia", biaya: 600000, rating: 4.7, jumlah_pengiriman: 120, image: "http://localhost:3001/uploads/destinasi/paris.jpg" },
+    { id: 3, nama: "Dubai", negara: "UAE", deskripsi: "Burj Khalifa & Belanja Mewah", biaya: 550000, rating: 4.6, jumlah_pengiriman: 180, image: "http://localhost:3001/uploads/destinasi/dubai.jpg" },
+    { id: 4, nama: "Singapore", negara: "Singapura", deskripsi: "Marina Bay Sands & Modern", biaya: 480000, rating: 4.9, jumlah_pengiriman: 200, image: "http://localhost:3001/uploads/destinasi/singapore.jpg" },
+    { id: 5, nama: "Bangkok", negara: "Thailand", deskripsi: "Kuil Buddha & Floating Market", biaya: 400000, rating: 4.5, jumlah_pengiriman: 95, image: "http://localhost:3001/uploads/destinasi/bangkok.jpg" },
+    { id: 6, nama: "Sydney", negara: "Australia", deskripsi: "Opera House & Pantai Indah", biaya: 700000, rating: 4.8, jumlah_pengiriman: 110, image: "http://localhost:3001/uploads/destinasi/sydney.jpg" },
+    { id: 7, nama: "New York", negara: "Amerika Serikat", deskripsi: "Times Square & Gedung Pencakar", biaya: 750000, rating: 4.7, jumlah_pengiriman: 200, image: "http://localhost:3001/uploads/destinasi/newyork.jpg" },
+    { id: 8, nama: "London", negara: "Inggris", deskripsi: "Big Ben & Tower Bridge", biaya: 650000, rating: 4.6, jumlah_pengiriman: 140, image: "http://localhost:3001/uploads/destinasi/london.jpg" },
+    { id: 9, nama: "Amsterdam", negara: "Belanda", deskripsi: "Kanal & Sepeda Bersejarah", biaya: 620000, rating: 4.5, jumlah_pengiriman: 85, image: "http://localhost:3001/uploads/destinasi/amsterdam.jpg" },
+    { id: 10, nama: "Barcelona", negara: "Spanyol", deskripsi: "Sagrada Familia & Park Güell", biaya: 580000, rating: 4.7, jumlah_pengiriman: 125, image: "http://localhost:3001/uploads/destinasi/barcelona.jpg" },
+    { id: 11, nama: "Istanbul", negara: "Turki", deskripsi: "Masjid Biru & Hagia Sophia", biaya: 480000, rating: 4.6, jumlah_pengiriman: 95, image: "http://localhost:3001/uploads/destinasi/istanbul.jpg" },
+    { id: 12, nama: "Bali", negara: "Indonesia", deskripsi: "Pantai Tropis & Kuil Hindu", biaya: 300000, rating: 4.9, jumlah_pengiriman: 350, image: "http://localhost:3001/uploads/destinasi/bali.jpg" }
+  ];
+
+  // Render grid destinasi penuh
+  function renderDestinationGrid(data = allDestinations) {
+    const grid = document.getElementById('destinasi-grid-full');
+    if (!grid) return;
+
+    grid.innerHTML = data.map(dest => `
+      <div class="destinasi-card-full">
+        <div class="destinasi-image">
+          <img src="${dest.image}" alt="${dest.nama}" onerror="this.src='https://via.placeholder.com/500x300?text=${dest.nama}'">
+          <div class="destinasi-badge">
+            <span><i class="fas fa-star"></i> ${dest.rating}</span>
+            <span><i class="fas fa-box"></i> ${dest.jumlah_pengiriman}</span>
+          </div>
+        </div>
+        <div class="destinasi-body">
+          <h3>${dest.nama}</h3>
+          <p class="negara"><i class="fas fa-map-marker-alt"></i> ${dest.negara}</p>
+          <p class="deskripsi">${dest.deskripsi}</p>
+          <div class="destinasi-footer">
+            <div class="biaya">Rp ${(dest.biaya).toLocaleString('id-ID')}</div>
+            <button class="btn-pesan" onclick="selectDestination('${dest.id}', '${dest.nama}')">
+              <i class="fas fa-check"></i> Pesan
+            </button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Filter & Search
+  const searchInput = document.getElementById('destinasi-search');
+  const sortSelect = document.getElementById('destinasi-sort');
+
+  if (searchInput) {
+    searchInput.addEventListener('input', function() {
+      const filtered = allDestinations.filter(dest => 
+        dest.nama.toLowerCase().includes(this.value.toLowerCase()) ||
+        dest.negara.toLowerCase().includes(this.value.toLowerCase())
+      );
+      renderDestinationGrid(filtered);
+    });
+  }
+
+  if (sortSelect) {
+    sortSelect.addEventListener('change', function() {
+      let sorted = [...allDestinations];
+      if (this.value === 'nama') {
+        sorted.sort((a, b) => a.nama.localeCompare(b.nama));
+      } else if (this.value === 'biaya') {
+        sorted.sort((a, b) => a.biaya - b.biaya);
+      } else if (this.value === 'populer') {
+        sorted.sort((a, b) => b.jumlah_pengiriman - a.jumlah_pengiriman);
+      }
+      renderDestinationGrid(sorted);
+    });
+  }
+
+  // Initial render
+  renderDestinationGrid();
+});
+</script>
+<footer style="text-align:center; padding:10px; margin-top:30px;">
+  @Copyright by 23552011379_SofyanMaulana_TIF23RP_UASWEB1
+</footer>
+</body>
+</html>
