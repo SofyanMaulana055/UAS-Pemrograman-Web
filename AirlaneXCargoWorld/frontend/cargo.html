@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Data Cargo</title>
+</head>
+<body>
+  <h2>Data Cargo</h2>
+
+  <input type="text" id="name" placeholder="Nama Cargo">
+  <input type="text" id="destination" placeholder="Tujuan">
+  <input type="number" id="weight" placeholder="Berat (kg)">
+  <button onclick="addCargo()">Tambah</button>
+
+  <ul id="list"></ul>
+
+  <script>
+    function loadCargo() {
+      fetch("http://localhost:3000/api/cargo")
+        .then(res => res.json())
+        .then(data => {
+          let list = document.getElementById("list");
+          list.innerHTML = "";
+          data.forEach(c => {
+            list.innerHTML += `<li>${c.name} - ${c.destination} - ${c.weight} kg</li>`;
+          });
+        });
+    }
+
+    function addCargo() {
+      fetch("http://localhost:3000/api/cargo", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({
+          name: name.value,
+          destination: destination.value,
+          weight: weight.value
+        })
+      }).then(() => loadCargo());
+    }
+
+    loadCargo();
+  </script>
+  <footer style="text-align:center; padding:10px; margin-top:30px;">
+  @Copyright by 23552011379_SofyanMaulana_TIF23RP_UASWEB1
+</footer>
+</body>
+</html>
